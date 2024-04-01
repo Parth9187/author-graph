@@ -19,7 +19,7 @@ def snowball_cheap(author_url,
 
 
     for listing in papers_li:
-        nodes, edges = extract_nodes_edges(listing, base_url_addon, different_style=True)
+        nodes, edges = extract_nodes_edges(listing, base_url_addon, different_style=1)
         all_nodes += nodes
         all_edges += edges
 
