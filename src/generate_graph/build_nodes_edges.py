@@ -1,39 +1,51 @@
 def extract_nodes_edges(listing, base_url_addon,
                         shared_papers_url=None,
                         proceedings_url=None,
-                        different_style=False):
+                        different_style=0):
 
       assert not ( shared_papers_url and proceedings_url ), "Can't provide both shared_papers_url or proceedings_url"
 
       proceedings_nodes = list()
       proceedings_edges = list()
-        
-      if not different_style:
-        paper_name = listing.find("h5", class_="issue-item__title").text
-        paper_doi = listing.find("h5", class_="issue-item__title").find(href=True)['href']
-        paper_doi = paper_doi.split("/")[-2] + '/' + paper_doi.split("/")[-1]
 
-      else:
-        paper_name = listing.find("h3", class_="issue-item__title").text
-        paper_doi = listing.find("h3", class_="issue-item__title").find(href=True)['href']
-        paper_doi = paper_doi.split("/")[-2] + '/' + paper_doi.split("/")[-1]
+      try:
+        if different_style in [0, 2]:
+          paper_name = listing.find("h5", class_="issue-item__title").text
+          paper_doi = listing.find("h5", class_="issue-item__title").find(href=True)['href']
+          paper_doi = paper_doi.split("/")[-2] + '/' + paper_doi.split("/")[-1]
+
+        else:
+          paper_name = listing.find("h3", class_="issue-item__title").text
+          paper_doi = listing.find("h3", class_="issue-item__title").find(href=True)['href']
+          paper_doi = paper_doi.split("/")[-2] + '/' + paper_doi.split("/")[-1]
+
+      except Exception as e:
+        return False, False
 
       paper_link = "https://doi.org/" + paper_doi
       paper_list = [paper_name, paper_doi, paper_link]
 
+      paper_abstract = "NoAbstract"
+      if different_style in [2]:
+        abstract_div = listing.find("div", class_="issue-item__abstract")
+        if abstract_div:
+          paper_abstract = abstract_div.find("p").text
+
+      if shared_papers_url:
+        pass
+
       if proceedings_url:
-          paper_info = [paper_doi, paper_name, paper_link, proceedings_url]
+          paper_info = [paper_doi, paper_name, paper_link, proceedings_url, paper_abstract]
 
       if not proceedings_url:
-          paper_info = [paper_doi, paper_name, paper_link, "NoURL"]
+          paper_info = [paper_doi, paper_name, paper_link, "NoURL", paper_abstract]
 
-      # Authors Information
       paper_authors_info = list()
 
-      if not different_style:
+      if different_style in [0]:
         authors_ul = listing.find_all("ul", {"aria-label": "authors"})
         authors_li_list = [li.find_all("a") for li in authors_ul][0]
-      
+
       else:
         authors_ul = listing.find_all("ul", {"title": "list of authors"})
         authors_li_list = [li.find_all("a") for li in authors_ul][0]
@@ -45,24 +57,19 @@ def extract_nodes_edges(listing, base_url_addon,
 
         paper_authors_info.append(author_info)
 
-      # Build Edges
       for a_one in range(len(paper_authors_info)):
         for a_two in range(a_one + 1, len(paper_authors_info)):
 
           author_one_url = paper_authors_info[a_one][0]
           author_two_url = paper_authors_info[a_two][0]
 
-          # Tuple to link nodes for NetworkX
           author_urls = (author_one_url, author_two_url)
 
-          # Combine tuple with Paper Details and add to Edges list()
           edge = [author_urls, paper_info]
           proceedings_edges.append(edge)
 
-      # Build Nodes
       for author in paper_authors_info:
         if author not in proceedings_nodes:
           proceedings_nodes.append(author)
 
       return proceedings_nodes, proceedings_edges
-
