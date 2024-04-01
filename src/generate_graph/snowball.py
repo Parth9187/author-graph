@@ -5,8 +5,7 @@ from generate_graph.build_nodes_edges import extract_nodes_edges
 from generate_graph.utils import expand_graph
 
 
-def snowball_abstracts(graph,
-                       author_url,
+def snowball_abstracts(author_url,
                        url_addon="https://dl.acm.org"):
       all_nodes = list()
       all_edges = list()
@@ -102,8 +101,13 @@ def snowball_generator(graph, node):
     print(f"{node}")
 
     try:
-      nodes_r, edges_r = snowball_cheap(node)
-    except:
+      nodes_r, edges_r = snowball_abstracts(node)
+      
+      if len(nodes_r) == 0:
+          print("IP Blocked")
+          return False
+      
+    except Exception as e:
       print("Process Interrupted\n")
       return False
 
