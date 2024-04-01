@@ -5,6 +5,27 @@ from generate_graph.build_nodes_edges import extract_nodes_edges
 from generate_graph.utils import expand_graph
 
 
+def snowball_abstracts(graph,
+                       author_url,
+                       url_addon="https://dl.acm.org"):
+      all_nodes = list()
+      all_edges = list()
+
+      author_publications = author_url + "/publications"
+
+      r = requests.get(author_publications)
+      soup = BeautifulSoup(r.text, 'html.parser')
+
+      papers_list = soup.find_all("li", {"class": "search__item issue-item-container"})
+
+      for paper in papers_list:
+          nodes, edges = extract_nodes_edges(paper, url_addon, different_style=2)
+          all_nodes += nodes
+          all_edges += edges
+
+      return all_nodes, all_edges
+
+
 def snowball_cheap(author_url,
                    base_url_addon="https://dl.acm.org"):
 
