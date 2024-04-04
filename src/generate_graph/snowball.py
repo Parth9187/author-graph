@@ -94,24 +94,3 @@ def snowball_expensive(graph,
     expand_graph(graph, all_nodes, all_edges)
 
     return True
-
-
-def snowball_generator(graph, node):
-
-    print(f"{node}")
-
-    try:
-      nodes_r, edges_r = snowball_abstracts(node)
-      
-      if len(nodes_r) == 0:
-          print("IP Blocked")
-          return False
-      
-    except Exception as e:
-      print("Process Interrupted\n")
-      return False
-
-    expand_graph(graph, nodes_r, edges_r)
-    print(f"Number of Edges: {len(graph.edges)}\n")
-
-    return True
