@@ -14,10 +14,27 @@ def extract_nodes_edges(listing, base_url_addon,
           paper_doi = listing.find("h5", class_="issue-item__title").find(href=True)['href']
           paper_doi = paper_doi.split("/")[-2] + '/' + paper_doi.split("/")[-1]
 
+          paper_access = "CLOSED"
+
+          open = listing.find_all("div", {"title": "This content is available through an open access license"})
+          if open:
+            paper_access = "OPEN"
+
+          public = listing.find_all("div", {"title": "This content is available through a public access license"})
+          if public:
+            paper_access = "PUBLIC"
+
+          free = listing.find_all("div", {"title": "This content is available for free"})
+          if free:
+            paper_access = "FREE"
+          
+
         else:
           paper_name = listing.find("h3", class_="issue-item__title").text
           paper_doi = listing.find("h3", class_="issue-item__title").find(href=True)['href']
           paper_doi = paper_doi.split("/")[-2] + '/' + paper_doi.split("/")[-1]
+
+          paper_access = "CLOSED"
 
       except Exception as e:
         return False, False
@@ -33,12 +50,13 @@ def extract_nodes_edges(listing, base_url_addon,
 
       if shared_papers_url:
         pass
+      
 
       if proceedings_url:
-          paper_info = [paper_doi, paper_name, paper_link, proceedings_url, paper_abstract]
+          paper_info = [paper_doi, paper_name, paper_link, proceedings_url, paper_abstract, paper_access]
 
       if not proceedings_url:
-          paper_info = [paper_doi, paper_name, paper_link, "NoURL", paper_abstract]
+          paper_info = [paper_doi, paper_name, paper_link, "NoURL", paper_abstract, paper_access]
 
       paper_authors_info = list()
 

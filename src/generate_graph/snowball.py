@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 from generate_graph.build_nodes_edges import extract_nodes_edges
 from generate_graph.utils import expand_graph
 
-
 def snowball_abstracts(author_url,
                        url_addon="https://dl.acm.org"):
       all_nodes = list()
@@ -39,7 +38,7 @@ def snowball_cheap(author_url,
 
 
     for listing in papers_li:
-        nodes, edges = extract_nodes_edges(listing, base_url_addon, different_style=1)
+        nodes, edges = extract_nodes_edges(listing, base_url_addon, different_style=True)
         all_nodes += nodes
         all_edges += edges
 
@@ -92,5 +91,26 @@ def snowball_expensive(graph,
           print("Less than 1 Paper Published!")
 
     expand_graph(graph, all_nodes, all_edges)
+
+    return True
+
+
+def snowball_generator(graph, node):
+
+    print(f"{node}")
+
+    try:
+      nodes_r, edges_r = snowball_abstracts(node)
+      
+      if len(nodes_r) == 0:
+          print("IP Blocked")
+          return False
+      
+    except Exception as e:
+      print("Process Interrupted\n")
+      return False
+
+    expand_graph(graph, nodes_r, edges_r)
+    print(f"Number of Edges: {len(graph.edges)}\n")
 
     return True
