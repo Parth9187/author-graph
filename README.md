@@ -6,7 +6,7 @@ Author information derived from public information about research.
 
 ### Scraping Conference Proceedings
 
-```
+``` python
 from generate_graph.proceedings_base import crawl_proceedings
 
 # Build nodes and edges for CHIWORK 2023 proceedings
@@ -19,7 +19,7 @@ nodes, edges, doi_url = crawl_proceedings(
 
 ### Building the Base Graph
 
-```
+``` python
 import networkx as nx
 from generate_graph.utils import expand_graph
 
@@ -35,7 +35,7 @@ nx.write_gml(g, "data/chiwork_base.gml")
 
 ### Extracting Nodes and Edges from Papers
 **Collecting Metadata (Emails)**
-```
+``` python
 import re, requests, io, PyPDF2
 
 def get_emails(pdf_url):
@@ -48,7 +48,7 @@ def get_emails(pdf_url):
 ```
 
 ### Snowball Expansion
-```
+``` python
 from generate_graph.snowball import snowball_generator
 
 for author_id in list(g.nodes):
@@ -58,7 +58,7 @@ for author_id in list(g.nodes):
 ```
 
 ### Visualizing the Graph
-```
+``` python
 import matplotlib.pyplot as plt
 import networkx as nx
 
@@ -68,6 +68,11 @@ def graph_vis(graph, image_path):
     nx.draw(graph, pos, node_size=15, alpha=0.4, width=0.3)
     plt.savefig(image_path)
 ```
+**Initial Plot of CHIWork '22 and '23**
+![plot](./figures/chiwork.png)
+
+**Expanded Abstracts Graph After 1 Snowball Cycle**
+![plot](./figures/chiwork_showball_abstract.png)
 
 ### Analyzing Author Similarity
-![plot](./figures/chiwork.png)
+
